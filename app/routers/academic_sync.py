@@ -59,7 +59,7 @@ async def create_record(
             action="error",
             status="failure",
             error_message=str(exc),
-            request_payload=body.model_dump(),
+            request_payload=body.model_dump(mode="json"),
         )
         raise
 
@@ -77,7 +77,20 @@ async def update_record(
     db: Session = Depends(get_db),
     _user: APIUser = Depends(get_current_user),
 ):
-    return academic_service.update_academic_record(db, record_id, body)
+    try:
+        return academic_service.update_academic_record(db, record_id, body)
+    except Exception as exc:
+        log_sync_event(
+            db,
+            direction="academic_to_crm",
+            entity_type="academic_record",
+            entity_id=record_id,
+            action="error",
+            status="failure",
+            error_message=str(exc),
+            request_payload=body.model_dump(mode="json", exclude_unset=True),
+        )
+        raise
 
 
 @router.get(

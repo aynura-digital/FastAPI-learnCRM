@@ -25,6 +25,10 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Alembic is the canonical migration tool for this project. The
+    # create_all fallback below is intentional and used ONLY in DEBUG mode
+    # for quick local bootstrapping and tests; it must never run against a
+    # database whose schema is owned by Alembic, as the two can diverge.
     if settings.debug:
         logger.info("DEBUG mode: creating database tables via metadata.create_all ...")
         Base.metadata.create_all(bind=engine)

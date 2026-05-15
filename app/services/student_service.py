@@ -30,7 +30,12 @@ def list_students(
     query = db.query(Student)
     if active_only:
         query = query.filter(Student.is_active.is_(True))
-    return query.offset(skip).limit(limit).all()
+    return (
+        query.order_by(Student.created_at.desc(), Student.id)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
 
 
 def create_or_update_student(db: Session, payload: StudentCreate) -> tuple[Student, str]:
@@ -55,7 +60,7 @@ def create_or_update_student(db: Session, payload: StudentCreate) -> tuple[Stude
             entity_type="student",
             entity_id=payload.crm_student_id,
             action="update",
-            request_payload=payload.model_dump(),
+            request_payload=payload.model_dump(mode="json"),
         )
         return existing, "updated"
 
@@ -70,7 +75,7 @@ def create_or_update_student(db: Session, payload: StudentCreate) -> tuple[Stude
         entity_type="student",
         entity_id=payload.crm_student_id,
         action="create",
-        request_payload=payload.model_dump(),
+        request_payload=payload.model_dump(mode="json"),
     )
     return student, "created"
 
@@ -91,6 +96,6 @@ def update_student(
         entity_type="student",
         entity_id=crm_student_id,
         action="update",
-        request_payload=update_data,
+        request_payload=payload.model_dump(mode="json", exclude_unset=True),
     )
     return student

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.database import get_db
 from app.dependencies import verify_api_key
 from app.models.user import APIUser
@@ -64,8 +65,6 @@ async def login(body: TokenRequest, db: Session = Depends(get_db)):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Account is deactivated",
         )
-
-    from app.config import settings
 
     token = create_access_token(subject=user.username)
     return TokenResponse(

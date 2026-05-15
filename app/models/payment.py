@@ -1,7 +1,7 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
-from sqlalchemy import JSON, DateTime, Float, ForeignKey, String
+from sqlalchemy import JSON, Date, DateTime, Float, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -24,7 +24,7 @@ class Payment(Base):
     payment_status: Mapped[str] = mapped_column(
         String(20), nullable=False
     )  # Paid, Pending, Failed, Refunded
-    payment_date: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    payment_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     invoice_number: Mapped[str | None] = mapped_column(String(64), nullable=True)
     modules_unlocked: Mapped[list[str] | None] = mapped_column(
         JSON, nullable=True

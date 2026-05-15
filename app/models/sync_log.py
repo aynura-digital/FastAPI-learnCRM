@@ -1,10 +1,14 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import DateTime, Integer, String, Text
+from sqlalchemy import JSON, DateTime, Integer, String, Text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
+
+# JSONB on PostgreSQL (indexable, queryable); falls back to JSON on SQLite.
+JSONPayload = JSON().with_variant(JSONB(), "postgresql")
 
 
 class SyncLog(Base):
@@ -29,8 +33,12 @@ class SyncLog(Base):
         String(10), nullable=False, default="success", index=True
     )  # success | failure
     http_status_code: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    request_payload: Mapped[str | None] = mapped_column(Text, nullable=True)
-    response_payload: Mapped[str | None] = mapped_column(Text, nullable=True)
+    request_payload: Mapped[dict | list | None] = mapped_column(
+        JSONPayload, nullable=True
+    )
+    response_payload: Mapped[dict | list | None] = mapped_column(
+        JSONPayload, nullable=True
+    )
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(

@@ -65,7 +65,7 @@ def process_payment(db: Session, payload: PaymentCreate) -> PaymentSyncResult:
         entity_type="payment",
         entity_id=payload.crm_payment_id,
         action=action,
-        request_payload=payload.model_dump(),
+        request_payload=payload.model_dump(mode="json"),
         response_payload={"modules_unlocked": unlocked},
     )
 
@@ -93,4 +93,9 @@ def list_payments(
         query = query.join(Student).filter(
             Student.crm_student_id == crm_student_id
         )
-    return query.offset(skip).limit(limit).all()
+    return (
+        query.order_by(Payment.created_at.desc(), Payment.id)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )

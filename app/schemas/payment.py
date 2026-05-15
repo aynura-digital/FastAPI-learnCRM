@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from enum import Enum
 
 from pydantic import BaseModel, Field
@@ -23,9 +23,7 @@ class PaymentCreate(BaseModel):
     amount: float = Field(..., gt=0, examples=[350.00])
     currency: str = Field("USD", min_length=3, max_length=3, examples=["USD"])
     payment_status: PaymentStatusEnum = Field(..., examples=["Paid"])
-    payment_date: str | None = Field(
-        None, pattern=r"^\d{4}-\d{2}-\d{2}$", examples=["2025-09-01"]
-    )
+    payment_date: date | None = Field(None, examples=["2025-09-01"])
     invoice_number: str | None = Field(None, max_length=64, examples=["INV-10045"])
     modules_to_unlock: list[str] | None = Field(
         None, examples=[["MOD-PY-101", "MOD-PY-102"]]
@@ -39,7 +37,7 @@ class PaymentResponse(BaseModel):
     amount: float
     currency: str
     payment_status: str
-    payment_date: str | None = None
+    payment_date: date | None = None
     invoice_number: str | None = None
     modules_unlocked: list[str] | None = None
     created_at: datetime

@@ -40,7 +40,7 @@ def create_academic_record(
         entity_type="academic_record",
         entity_id=record.id,
         action="create",
-        request_payload=payload.model_dump(),
+        request_payload=payload.model_dump(mode="json"),
     )
     return record
 
@@ -81,6 +81,7 @@ def list_records_for_student(
     return (
         db.query(AcademicRecord)
         .filter(AcademicRecord.student_id == student.id)
+        .order_by(AcademicRecord.recorded_at.desc(), AcademicRecord.id)
         .all()
     )
 
@@ -95,6 +96,7 @@ def build_crm_payload(
     records = (
         db.query(AcademicRecord)
         .filter(AcademicRecord.student_id == student.id)
+        .order_by(AcademicRecord.recorded_at.desc(), AcademicRecord.id)
         .all()
     )
 

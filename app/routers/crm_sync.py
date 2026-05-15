@@ -70,7 +70,7 @@ async def sync_student(
             action="error",
             status="failure",
             error_message=str(exc),
-            request_payload=body.model_dump(),
+            request_payload=body.model_dump(mode="json"),
         )
         raise
 
@@ -88,7 +88,20 @@ async def update_student(
     db: Session = Depends(get_db),
     _user: APIUser = Depends(get_current_user),
 ):
-    return student_service.update_student(db, crm_student_id, body)
+    try:
+        return student_service.update_student(db, crm_student_id, body)
+    except Exception as exc:
+        log_sync_event(
+            db,
+            direction="crm_to_academic",
+            entity_type="student",
+            entity_id=crm_student_id,
+            action="error",
+            status="failure",
+            error_message=str(exc),
+            request_payload=body.model_dump(mode="json", exclude_unset=True),
+        )
+        raise
 
 
 @router.get(
@@ -155,7 +168,7 @@ async def sync_payment(
             action="error",
             status="failure",
             error_message=str(exc),
-            request_payload=body.model_dump(),
+            request_payload=body.model_dump(mode="json"),
         )
         raise
 

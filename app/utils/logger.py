@@ -1,4 +1,3 @@
-import json
 import logging
 
 from sqlalchemy.orm import Session
@@ -17,8 +16,8 @@ def log_sync_event(
     action: str,
     status: str = "success",
     http_status_code: int | None = None,
-    request_payload: dict | None = None,
-    response_payload: dict | None = None,
+    request_payload: dict | list | None = None,
+    response_payload: dict | list | None = None,
     error_message: str | None = None,
 ) -> SyncLog | None:
     """Write a sync event to both the database and the Python logger.
@@ -34,8 +33,8 @@ def log_sync_event(
         action=action,
         status=status,
         http_status_code=http_status_code,
-        request_payload=json.dumps(request_payload) if request_payload else None,
-        response_payload=json.dumps(response_payload) if response_payload else None,
+        request_payload=request_payload,
+        response_payload=response_payload,
         error_message=error_message,
     )
     try:

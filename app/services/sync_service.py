@@ -19,4 +19,9 @@ def get_sync_logs(
         query = query.filter(SyncLog.entity_type == entity_type)
     if status:
         query = query.filter(SyncLog.status == status)
-    return query.order_by(SyncLog.created_at.desc()).offset(skip).limit(limit).all()
+    return (
+        query.order_by(SyncLog.created_at.desc(), SyncLog.id)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )

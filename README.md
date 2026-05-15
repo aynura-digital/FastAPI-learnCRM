@@ -62,7 +62,7 @@ Data between these systems was previously transferred manually or through file e
 - **Auto-generated Swagger UI** — interactive API documentation at `/docs`
 - **ReDoc** — alternative documentation at `/redoc`
 - **Docker-ready** — full `docker-compose.yml` with PostgreSQL
-- **Alembic migrations** — version-controlled database schema
+- **Alembic migrations** — version-controlled database schema (canonical; `create_all` is only used as a DEBUG-mode bootstrap and must not run against an Alembic-managed database)
 - **Comprehensive test suite** — pytest with in-memory SQLite
 
 ---
@@ -216,7 +216,7 @@ students
 │   ├── amount, currency
 │   ├── payment_status (Paid | Pending | Failed | Refunded)
 │   ├── payment_date, invoice_number
-│   ├── modules_unlocked (CSV)
+│   ├── modules_unlocked (JSON array)
 │   ├── created_at, updated_at
 │
 └──< academic_records (1:N)
@@ -237,8 +237,8 @@ sync_logs (audit trail)
 ├── action (create | update | sync | error)
 ├── status (success | failure)
 ├── http_status_code
-├── request_payload (JSON text)
-├── response_payload (JSON text)
+├── request_payload (JSONB on PostgreSQL, JSON on SQLite)
+├── response_payload (JSONB on PostgreSQL, JSON on SQLite)
 ├── error_message
 └── created_at
 ```
@@ -247,7 +247,7 @@ sync_logs (audit trail)
 
 - **`crm_student_id`** is the natural key used to link a CRM record to the local student. All endpoints accept CRM IDs, not internal UUIDs.
 - **`sync_logs`** captures every API call regardless of outcome, enabling full auditability.
-- **`modules_unlocked`** is stored as a comma-separated string for simplicity; in a high-scale deployment this could be a join table.
+- **`modules_unlocked`** is stored as a JSON array (PostgreSQL `JSON` / SQLite `JSON`). In a high-scale deployment this could be promoted to a join table for indexed querying.
 
 ---
 
